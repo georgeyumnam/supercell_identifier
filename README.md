@@ -1,7 +1,6 @@
 # supercell_identifier
 
-## This repository constain scripts to identify supercell dimensions
-## which are best suitable for phonon calculations.
+## This repository contain scripts to identify supercell dimensions which are best suitable for phonon calculations.
 
 This repository contains the following scripts :
 [1] supercell_dim_identifier.py
