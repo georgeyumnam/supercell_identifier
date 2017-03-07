@@ -101,6 +101,42 @@ def best_combo_with_least_LCM(num1, num2, num3):
     a, b, c = req_mat
     return a, b, c, LCM
 
+
+def sup_zero_conv(sup_nx, sup_ny, sup_nz):
+    sup = [sup_nx, sup_ny, sup_nz]
+    for i in range(3):
+        if sup[i] == 0:
+	    sup[i] = 1
+	    for j in range(3):
+	        if j != i :
+		    sup[j] = sup[j] - 1
+    return sup[0], sup[1], sup[2]
+
+
+def final_sup_check(sup_nx, sup_ny, sup_nz, aaa, bbb, ccc, num_atoms_in_unit_cell, given):
+    supp = [sup_nx, sup_ny, sup_nz]
+    n1 = supp[0] * aaa
+    n2 = supp[1] * bbb
+    n3 = supp[2] * ccc
+    sup = np.array([[sup_nx, n1, 0], [sup_ny, n2, 1], [sup_nz, n3, 2]])
+    mmm = sup[sup[:, 1].argsort()]
+    min_n = mmm[0][1]
+    max_n = mmm[2][1]
+    num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
+    if num_at_sup < given :
+        if mmm[2][1] / mmm[0][1] > 1.8 :
+	    mmm[0][0] = mmm[0][0] + 1
+	if mmm[2][1] / mmm[1][1] > 1.8 :
+	    mmm[1][0] = mmm[1][0] + 1 
+    mmm = np.array(mmm)
+    nnn = mmm[mmm[:, 2].argsort()]
+    supx, supy, supz = nnn[0][0], nnn[1][0], nnn[2][0]
+    return supx, supy, supz
+    
+
+
+
+
 def main_function(lattice, positions):
     a, b, c, alpha, beta, gamma = cl.cell_to_cellpar(lattice)
     aa = round_off_of_num(a)
@@ -124,37 +160,36 @@ def main_function(lattice, positions):
     checker = "unacceptable"
  
     while checker != "accept" :
-      print 1
       if check < 1 :
-        print 2
         if num_at_sup > given_hard :
-            print 3
             sup_nx = sup_nx - 1
             sup_ny = sup_ny - 1
             sup_nz = sup_nz - 1
+	    sup_nx, sup_ny, sup_nz = sup_zero_conv(sup_nx, sup_ny, sup_nz)
             num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
             check = given / num_at_sup
         else :
-            print 4
             nx, ny, nz = sup_nx, sup_ny, sup_nz
             checker = "accept"
       elif check > 1 :
-        print 5
         sup_nx = sup_nx + 1
         sup_ny = sup_ny + 1
         sup_nz = sup_nz + 1
         num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
         check = given / num_at_sup
         if check < 1 :
-          print 6
           if num_at_sup > given_hard :
-            print 7
             sup_nx = sup_nx - 1
             sup_ny = sup_ny - 1
             sup_nz = sup_nz - 1
+	    sup_nx, sup_ny, sup_nz = sup_zero_conv(sup_nx, sup_ny, sup_nz)
             num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
             check = given / num_at_sup
             checker = "accept"        
+    
+
+    sup_nx, sup_ny, sup_nz = final_sup_check(sup_nx, sup_ny, sup_nz, aaa, bbb, ccc, num_atoms_in_unit_cell, given)
+    num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
 
     SUP_LATT = supercell_lattice(lattice, sup_nx, sup_ny, sup_nz)
     SMOOTH_SUP_LATT = supercell_lattice_smoothen(SUP_LATT)
