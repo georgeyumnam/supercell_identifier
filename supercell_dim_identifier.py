@@ -1,3 +1,8 @@
+"""
+__author__ = George Yumnam
+Code written to choose the supercell for different materials with different geometries.
+"""
+
 import sys
 import os.path
 from ase.geometry import cell as cl
