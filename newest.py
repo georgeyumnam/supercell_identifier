@@ -1,3 +1,9 @@
+"""
+__author__ = George Yumnam
+Code written to choose the supercell for different materials with different geometries.
+"""
+
+
 from ase.geometry import cell as cl
 from spglib import find_primitive, standardize_cell
 from phonopy.interface import vasp as v
@@ -70,7 +76,7 @@ def supercell_lattice_smoothen(checker_lattice):
 
 def permutation_definer(num1, num2, num3):
     """
-    This function returns the total permutations possible for all 
+    This function returns the total permutations possible for all
     given numbers for computing the LCM
     """
     matrix = np.zeros((27, 3))
@@ -127,12 +133,12 @@ def final_sup_check(sup_nx, sup_ny, sup_nz, aaa, bbb, ccc, num_atoms_in_unit_cel
         if mmm[2][1] / mmm[0][1] > 1.8 :
 	    mmm[0][0] = mmm[0][0] + 1
 	if mmm[2][1] / mmm[1][1] > 1.8 :
-	    mmm[1][0] = mmm[1][0] + 1 
+	    mmm[1][0] = mmm[1][0] + 1
     mmm = np.array(mmm)
     nnn = mmm[mmm[:, 2].argsort()]
     supx, supy, supz = nnn[0][0], nnn[1][0], nnn[2][0]
     return supx, supy, supz
-    
+
 
 
 
@@ -153,12 +159,12 @@ def main_function(lattice, positions):
 
     given = 100
     given_hard = 140
-    
+
     num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
     check = given / num_at_sup
-   
+
     checker = "unacceptable"
- 
+
     while checker != "accept" :
       if check < 1 :
         if num_at_sup > given_hard :
@@ -185,8 +191,8 @@ def main_function(lattice, positions):
 	    sup_nx, sup_ny, sup_nz = sup_zero_conv(sup_nx, sup_ny, sup_nz)
             num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
             check = given / num_at_sup
-            checker = "accept"        
-    
+            checker = "accept"
+
 
     sup_nx, sup_ny, sup_nz = final_sup_check(sup_nx, sup_ny, sup_nz, aaa, bbb, ccc, num_atoms_in_unit_cell, given)
     num_at_sup = num_atoms_in_unit_cell * sup_nx * sup_ny * sup_nz
